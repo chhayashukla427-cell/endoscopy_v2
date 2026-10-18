@@ -1,0 +1,38 @@
+:root { --ink: #172b3a; --muted: #748390; --teal: #147f79; --paper: #f7f9fb; }
+* { box-sizing: border-box; }
+body { min-width: 320px; margin: 0; color: var(--ink); background: var(--paper); font-family: "Segoe UI", Inter, -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+.site-header { height: 72px; display: flex; align-items: center; justify-content: space-between; max-width: 1160px; margin: 0 auto; padding: 0 30px; border-bottom: 1px solid #e7ecef; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; letter-spacing: -.55px; }
+.brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; color: white; background: var(--teal); font-family: Georgia, serif; font-size: 21px; font-weight: 500; }
+.brand-light { color: #71818c; font-weight: 500; }
+.back-link { color: #62737c; font-size: 11px; font-weight: 600; }
+.back-link span { margin-right: 6px; color: var(--teal); font-size: 15px; }
+.gallery-page { max-width: 1100px; margin: 0 auto; padding: 39px 28px 30px; }
+.page-heading { display: flex; align-items: flex-end; justify-content: space-between; margin: 0 0 22px; }
+.section-kicker { margin: 0 0 7px; color: var(--teal); font-size: 8px; font-weight: 700; letter-spacing: 1.5px; }
+.page-heading h1 { margin: 0; font-size: 25px; font-weight: 650; letter-spacing: -.8px; }
+.page-description { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
+.gallery-count { padding: 7px 10px; border: 1px solid #e3e9eb; border-radius: 6px; color: var(--teal); background: #fff; font-size: 10px; font-weight: 700; }
+.gallery-count span { color: #839198; font-weight: 500; }
+.flash-message { margin: 0 0 15px; padding: 12px 15px; border: 1px solid #f2d7d2; border-radius: 8px; color: #98483d; background: #fff8f6; font-size: 12px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+.sample-card { overflow: hidden; border: 1px solid #e4eaed; border-radius: 8px; background: #fff; box-shadow: 0 8px 22px rgba(31,55,67,.035); transition: transform .18s ease, box-shadow .18s ease; }
+.sample-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(31,55,67,.09); }
+.sample-image-wrap { position: relative; height: 176px; overflow: hidden; background: #edf1f2; }
+.sample-image-wrap::after { position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(12,29,34,.37)); content: ""; pointer-events: none; }
+.sample-image-wrap img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .25s ease; }
+.sample-card:hover .sample-image-wrap img { transform: scale(1.025); }
+.sample-index { position: absolute; z-index: 1; bottom: 10px; left: 11px; color: rgba(255,255,255,.9); font-size: 8px; font-weight: 700; letter-spacing: 1px; }
+.sample-card-footer { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 11px; }
+.sample-card-footer strong, .sample-card-footer small { display: block; }
+.sample-card-footer strong { color: #4a5d66; font-size: 9px; font-weight: 650; }
+.sample-card-footer small { margin-top: 4px; color: #94a0a5; font-size: 8px; }
+.select-button { min-height: 30px; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid #d7e7e3; border-radius: 5px; color: var(--teal); background: #f6faf8; cursor: pointer; font: inherit; font-size: 9px; font-weight: 650; transition: background .18s ease, border .18s ease; }
+.select-button:hover { border-color: var(--teal); background: #eaf5f2; }
+.select-button span { font-size: 12px; }
+.disclaimer { margin: 20px 0 0; color: #9aa5a9; font-size: 9px; text-align: center; }
+@media (min-width: 1200px) { .site-header { padding-right: 0; padding-left: 0; } }
+@media (max-width: 760px) { .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } .gallery-page { padding-right: 20px; padding-left: 20px; } .sample-image-wrap { height: 158px; } }
+@media (max-width: 480px) { .site-header { height: 64px; padding: 0 18px; } .gallery-page { padding: 27px 15px; } .gallery-grid { gap: 9px; } .sample-image-wrap { height: 122px; } .sample-card-footer { align-items: flex-start; flex-direction: column; } .select-button { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }

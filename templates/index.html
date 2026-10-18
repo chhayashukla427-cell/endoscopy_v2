@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f9fc">
+    <title>GastroVision | Endoscopy image analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('main_page') }}" aria-label="GastroVision home">
+            <span class="brand-mark" aria-hidden="true">G</span>
+            <span>Gastro<span class="brand-light">Vision</span></span>
+        </a>
+        <nav class="header-nav" aria-label="Main navigation">
+            <a href="{{ url_for('show_gallery') }}">Sample gallery</a>
+            <span class="status-pill"><span class="status-dot"></span> Research prototype</span>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow"><span class="eyebrow-line"></span> AI-ASSISTED ENDOSCOPY</p>
+                <h1>A clearer view.<br><span>A smarter second look.</span></h1>
+                <p class="hero-description">Explore gastric endoscopy images with patch-based classification. Upload an image, select a region, and view the model’s prediction.</p>
+                <div class="hero-facts">
+                    <span><span class="fact-check">✓</span> Six gastric tissue classes</span>
+                    <span><span class="fact-check">✓</span> Analyze a region of interest</span>
+                </div>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <div class="art-glow"></div>
+                <div class="art-orbit orbit-one"></div>
+                <div class="art-orbit orbit-two"></div>
+                <div class="art-center"><span class="art-crosshair">+</span><span class="art-center-label">REGION<br>OF INTEREST</span></div>
+                <span class="art-chip chip-top">IMAGE ANALYSIS</span>
+                <span class="art-chip chip-bottom"><span class="status-dot"></span> READY TO EXPLORE</span>
+            </div>
+        </section>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message" role="alert">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="workspace" aria-labelledby="upload-title">
+            <div class="workspace-heading">
+                <div>
+                    <p class="section-kicker">GET STARTED</p>
+                    <h2 id="upload-title">Choose an endoscopy image</h2>
+                    <p class="section-description">Upload an image from your device or explore one of the sample images.</p>
+                </div>
+                <span class="step-indicator"><span>01</span> / 02</span>
+            </div>
+
+            <form action="{{ url_for('upload_page') }}" method="post" enctype="multipart/form-data" id="upload-form">
+                <label class="upload-zone" for="file-input" id="upload-zone">
+                    <input id="file-input" type="file" accept=".png,.jpg,.jpeg,.tif,.tiff,image/png,image/jpeg,image/tiff" name="file_input" required>
+                    <span class="upload-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="upload-title" id="upload-title-text">Drop your image here or <span>browse files</span></span>
+                    <span class="upload-meta" id="upload-meta">PNG, JPG or TIFF · Maximum 16 MB</span>
+                    <img class="upload-preview" id="upload-preview" alt="Selected image preview" hidden>
+                </label>
+                <div class="upload-actions">
+                    <p class="privacy-note"><span aria-hidden="true">⌑</span> Images are processed by this local app.</p>
+                    <button class="primary-button" type="submit" id="analyze-button" disabled>
+                        Continue to analysis
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </form>
+
+            <div class="divider"><span>OR TRY A SAMPLE</span></div>
+            <a class="gallery-link" href="{{ url_for('show_gallery') }}">
+                <span class="gallery-link-icon" aria-hidden="true">▦</span>
+                <span><strong>Explore the sample gallery</strong><small>Start with one of the included images</small></span>
+                <span class="gallery-arrow" aria-hidden="true">↗</span>
+            </a>
+        </section>
+
+        <section class="how-it-works" aria-label="How it works">
+            <div><span class="how-number">01</span><span><strong>Choose an image</strong><small>Upload or pick a sample</small></span></div>
+            <span class="how-connector" aria-hidden="true"></span>
+            <div><span class="how-number">02</span><span><strong>Select a patch</strong><small>Click a region to inspect</small></span></div>
+            <span class="how-connector" aria-hidden="true"></span>
+            <div><span class="how-number">03</span><span><strong>View prediction</strong><small>See the model’s result</small></span></div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <span>GastroVision <span class="footer-separator">·</span> Research prototype</span>
+        <span>For research and educational use only. Not for clinical diagnosis.</span>
+    </footer>
+
+    <script>
+        (() => {
+            const input = document.getElementById("file-input");
+            const zone = document.getElementById("upload-zone");
+            const preview = document.getElementById("upload-preview");
+            const title = document.getElementById("upload-title-text");
+            const meta = document.getElementById("upload-meta");
+            const button = document.getElementById("analyze-button");
+            let previewUrl;
+
+            function showFile(file) {
+                if (!file) return;
+                const allowed = /\.(png|jpe?g|tiff?)$/i.test(file.name);
+                if (!allowed) {
+                    input.value = "";
+                    title.textContent = "Choose a PNG, JPG or TIFF image";
+                    meta.textContent = "This file type is not supported.";
+                    button.disabled = true;
+                    preview.hidden = true;
+                    return;
+                }
+                if (file.size > 16 * 1024 * 1024) {
+                    input.value = "";
+                    title.textContent = "Choose an image smaller than 16 MB";
+                    meta.textContent = "This file is too large to upload.";
+                    button.disabled = true;
+                    preview.hidden = true;
+                    return;
+                }
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                previewUrl = URL.createObjectURL(file);
+                preview.src = previewUrl;
+                preview.hidden = false;
+                title.textContent = file.name;
+                meta.textContent = `${(file.size / (1024 * 1024)).toFixed(2)} MB · Ready to analyze`;
+                button.disabled = false;
+            }
+
+            input.addEventListener("change", () => showFile(input.files[0]));
+            ["dragenter", "dragover"].forEach((eventName) => zone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                zone.classList.add("is-dragging");
+            }));
+            ["dragleave", "drop"].forEach((eventName) => zone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                zone.classList.remove("is-dragging");
+            }));
+            zone.addEventListener("drop", (event) => {
+                const file = event.dataTransfer.files[0];
+                if (!file) return;
+                const transfer = new DataTransfer();
+                transfer.items.add(file);
+                input.files = transfer.files;
+                showFile(file);
+            });
+        })();
+    </script>
+</body>
+</html>

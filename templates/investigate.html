@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f9fc">
+    <title>Analyze image | GastroVision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/investigate.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('main_page') }}" aria-label="GastroVision home">
+            <span class="brand-mark" aria-hidden="true">G</span>
+            <span>Gastro<span class="brand-light">Vision</span></span>
+        </a>
+        <a class="back-link" href="{{ url_for('main_page') }}"><span aria-hidden="true">←</span> New image</a>
+    </header>
+
+    <main class="analysis-page">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">IMAGE WORKSPACE</p>
+                <h1>Explore your image</h1>
+                <p class="page-description">Select a region on the image to classify a gastric tissue patch.</p>
+            </div>
+            <span class="step-indicator"><span>02</span> / 02</span>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message" role="alert">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="analysis-layout">
+            <div class="image-card">
+                <div class="image-card-header">
+                    <span class="image-heading"><span class="image-heading-dot"></span> ENDOSCOPY IMAGE</span>
+                    <span class="image-hint">Click anywhere to select a patch</span>
+                </div>
+                <form action="{{ url_for('classify_patch') }}" name="coordinates_form" method="post" id="coordinates-form">
+                    <input type="hidden" name="image_backend" value="{{ image_backend }}">
+                    <input type="hidden" name="form_x" id="form-x">
+                    <input type="hidden" name="form_y" id="form-y">
+                    <button class="image-select-button" type="submit" aria-label="Select a patch from the endoscopy image">
+                        <img src="{{ image_backend }}" id="display-img" alt="Endoscopy image. Select a region to classify." draggable="false">
+                    </button>
+                </form>
+                <div class="image-card-footer"><span>Original image proportions preserved</span><span>Click to analyze a region <span aria-hidden="true">↗</span></span></div>
+            </div>
+
+            <aside class="insight-panel">
+                <div class="insight-top">
+                    <span class="insight-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    </span>
+                    <span class="insight-label">PATCH CLASSIFICATION</span>
+                </div>
+                {% if prediction %}
+                    <p class="result-caption">Model prediction</p>
+                    <h2 class="result-title">{{ prediction }}</h2>
+                    <div class="result-status"><span></span> Patch analyzed</div>
+                    <p class="result-description">Select another region on the image to view a new prediction.</p>
+                {% else %}
+                    <p class="result-caption">Ready when you are</p>
+                    <h2 class="waiting-title">Choose a region<br>to get started.</h2>
+                    <p class="result-description">Click on the image to classify the surrounding patch using the trained model.</p>
+                    <div class="tip-card"><span class="tip-icon" aria-hidden="true">✳</span><span><strong>Helpful tip</strong><small>Click near the center of the area you’d like to inspect.</small></span></div>
+                {% endif %}
+                <div class="class-list">
+                    <p>MODEL CLASSES</p>
+                    <div>Active gastritis <span></span></div>
+                    <div>Atrophic gastritis <span></span></div>
+                    <div>Chronic gastritis <span></span></div>
+                    <div>Intestinal metaplasia <span></span></div>
+                    <div>Normal <span></span></div>
+                    <div>Ulcers <span></span></div>
+                </div>
+            </aside>
+        </section>
+        <p class="disclaimer">Research and educational use only. Model predictions are not a medical diagnosis.</p>
+    </main>
+
+    <script>
+        (() => {
+            const image = document.getElementById("display-img");
+            const form = document.getElementById("coordinates-form");
+            const button = form.querySelector(".image-select-button");
+            button.addEventListener("click", (event) => {
+                event.preventDefault();
+                if (!image.complete || !image.naturalWidth) return;
+                const rect = image.getBoundingClientRect();
+                const clientX = event.detail === 0 ? rect.left + rect.width / 2 : event.clientX;
+                const clientY = event.detail === 0 ? rect.top + rect.height / 2 : event.clientY;
+                const x = Math.max(0, Math.min(image.naturalWidth - 1, Math.round((clientX - rect.left) * image.naturalWidth / rect.width)));
+                const y = Math.max(0, Math.min(image.naturalHeight - 1, Math.round((clientY - rect.top) * image.naturalHeight / rect.height)));
+                document.getElementById("form-x").value = x;
+                document.getElementById("form-y").value = y;
+                form.submit();
+            });
+        })();
+    </script>
+</body>
+</html>

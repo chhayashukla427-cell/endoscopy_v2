@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f9fc">
+    <title>Sample gallery | GastroVision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/gallery.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('main_page') }}" aria-label="GastroVision home">
+            <span class="brand-mark" aria-hidden="true">G</span>
+            <span>Gastro<span class="brand-light">Vision</span></span>
+        </a>
+        <a class="back-link" href="{{ url_for('main_page') }}"><span aria-hidden="true">←</span> Back to home</a>
+    </header>
+
+    <main class="gallery-page">
+        <div class="page-heading">
+            <div>
+                <p class="section-kicker">EXPLORE THE DATASET</p>
+                <h1>Sample image gallery</h1>
+                <p class="page-description">Choose an image to open it in the analysis workspace.</p>
+            </div>
+            <span class="gallery-count">{{ samples|length }} <span>samples</span></span>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message" role="alert">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="gallery-grid">
+            {% for sample in samples %}
+                <article class="sample-card">
+                    <div class="sample-image-wrap">
+                        <img src="{{ url_for('static', filename='sample_images/' ~ sample) }}" alt="Endoscopy sample {{ loop.index }}" loading="lazy">
+                        <span class="sample-index">SAMPLE {{ "%02d"|format(loop.index) }}</span>
+                    </div>
+                    <div class="sample-card-footer">
+                        <span><strong>Endoscopy image</strong><small>Ready for patch analysis</small></span>
+                        <form action="{{ url_for('upload_sample') }}" method="post">
+                            <input type="hidden" name="sample" value="{{ sample }}">
+                            <button class="select-button" type="submit" aria-label="Analyze sample {{ loop.index }}">Analyze <span aria-hidden="true">↗</span></button>
+                        </form>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        <p class="disclaimer">Sample images are provided for research and educational exploration only.</p>
+    </main>
+</body>
+</html>
